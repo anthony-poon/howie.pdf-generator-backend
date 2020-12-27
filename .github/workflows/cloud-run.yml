@@ -4,6 +4,10 @@ name: Deploy docker image to Cloud Run
         branches:
             - main
 
+env:
+    PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    SERVICE_NAME: pdf-generator-backend
+
 # https://github.com/google-github-actions/setup-gcloud/blob/master/example-workflows/cloud-run/README.md
 jobs:
     build_and_deploy:
@@ -13,9 +17,10 @@ jobs:
                 uses: google-github-actions/setup-gcloud@master
                 with:
                     project_id: ${{ secrets.GCP_PROJECT_ID }}
+                    service_account_email: ${{ secrets.GCP_SA_EMAIL }}
                     service_account_key: ${{ secrets.GCP_SA_KEY }}
                     export_default_credentials: true
             -   name: Build image
-                run: gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/pdf-generator-backend
+                run: gcloud builds submit --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
             -   name: Deploy to Cloud Run
-                run: gcloud run deploy --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/pdf-generator-backend --platform managed
+                run: gcloud run deploy --image "gcr.io/$PROJECT_ID/$SERVICE_NAME" --platform managed

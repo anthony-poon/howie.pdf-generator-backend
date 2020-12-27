@@ -23,6 +23,13 @@ jobs:
                     service_account_key: ${{ secrets.GCP_SA_KEY }}
                     export_default_credentials: true
             -   name: Build image
-                run: gcloud builds submit --tag gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+                run: |-
+                    gcloud builds submit \
+                    --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
             -   name: Deploy to Cloud Run
-                run: gcloud run deploy $SERVICE_NAME --region asia-east1 --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA --platform managed
+                run: |-
+                    gcloud run deploy $SERVICE_NAME \
+                    --allow-unauthenticated \
+                    --region asia-east1 \
+                    --image "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA" \
+                    --platform managed
